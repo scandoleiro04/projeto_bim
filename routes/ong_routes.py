@@ -16,6 +16,22 @@ def cadastrar_ong():
     ongs.append(ong)
     return jsonify({"mensagem": "ONG cadastrada com sucesso."}), 201
 
+@ong_bp.route('/ongs', methods=['GET'])
+def listar_ongs():
+    if not ongs:
+        return jsonify({
+            "erro": "ONG_LIST_NOT_FOUND",
+            "mensagem": "Nenhuma ONG cadastrada."
+        }), 404
+
+    return jsonify([{
+        "id": o.id,
+        "nome": o.nome,
+        "cnpj": o.cnpj,
+        "localizacao": o.localizacao
+    } for o in ongs]), 200
+
+
 @ong_bp.route('/ongs/<int:id>', methods=['DELETE'])
 def deletar_ong(id):
     for o in ongs:
