@@ -1,3 +1,3 @@
-restaurantes = []
+restaurante = []
 ongs = []
 doacoes = []

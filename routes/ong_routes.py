@@ -1,41 +1,31 @@
 from flask import Blueprint, request, jsonify
-from models.ong import ONG
-from services.database import ongs
+from services import ong_service
 
 ong_bp = Blueprint('ong_bp', __name__)
 
 @ong_bp.route('/ongs', methods=['POST'])
 def cadastrar_ong():
     data = request.json
-    if not data.get('nome') or not data.get('cnpj') or not data.get('localizacao'):
-        return jsonify({"erro": "INVALID_ONG_DATA", "mensagem": "Dados inválidos fornecidos."}), 400
-    for o in ongs:
-        if o.cnpj == data['cnpj']:
-            return jsonify({"erro": "ONG_EXISTS", "mensagem": "ONG já cadastrada."}), 409
-    ong = ONG(len(ongs)+1, data['nome'], data['cnpj'], data['localizacao'])
-    ongs.append(ong)
-    return jsonify({"mensagem": "ONG cadastrada com sucesso."}), 201
+    resposta, status = ong_service.cadastrar_ong(data)
+    return jsonify(resposta), status
 
 @ong_bp.route('/ongs', methods=['GET'])
 def listar_ongs():
-    if not ongs:
-        return jsonify({
-            "erro": "ONG_LIST_NOT_FOUND",
-            "mensagem": "Nenhuma ONG cadastrada."
-        }), 404
+    resposta, status = ong_service.listar_ongs()
+    return jsonify(resposta), status
 
-    return jsonify([{
-        "id": o.id,
-        "nome": o.nome,
-        "cnpj": o.cnpj,
-        "localizacao": o.localizacao
-    } for o in ongs]), 200
+@ong_bp.route('/ongs/<int:id>', methods=['GET'])
+def obter_ong_por_id(id):
+    resposta, status = ong_service.obter_ong_por_id(id)
+    return jsonify(resposta), status
 
+@ong_bp.route('/ongs/<int:id>', methods=['PUT'])
+def atualizar_ong(id):
+    data = request.json
+    resposta, status = ong_service.atualizar_ong(id, data)
+    return jsonify(resposta), status
 
 @ong_bp.route('/ongs/<int:id>', methods=['DELETE'])
 def deletar_ong(id):
-    for o in ongs:
-        if o.id == id:
-            ongs.remove(o)
-            return jsonify({"mensagem": "ONG excluída com sucesso."}), 200
-    return jsonify({"erro": "ONG_NOT_FOUND", "mensagem": "ONG não encontrada."}), 404
+    resposta, status = ong_service.deletar_ong(id)
+    return jsonify(resposta), status

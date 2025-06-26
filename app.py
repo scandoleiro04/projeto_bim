@@ -1,10 +1,12 @@
 from flask import Flask
 from routes.ong_routes import ong_bp
 from routes.doacao_routes import doacao_bp
+from routes.restaurante_routes import restaurante_bp 
 
 app = Flask(__name__)
 app.register_blueprint(ong_bp)
 app.register_blueprint(doacao_bp)
+app.register_blueprint(restaurante_bp)
 
 @app.route('/')
 def home():
